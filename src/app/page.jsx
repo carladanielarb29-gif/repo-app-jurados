@@ -75,6 +75,9 @@ export default function Home() {
                 Correo
               </th>
               <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">
+                Nombre del Proyecto
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">
                 Código Alfanumérico
               </th>
             </tr>
@@ -112,6 +115,9 @@ export default function Home() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500">
                     {author.email}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                    {author.nombreProyecto || "No disponible"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500">
                     {author.alph || "No disponible"}

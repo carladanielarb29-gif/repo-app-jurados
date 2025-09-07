@@ -22,6 +22,30 @@ export default function UserDetailPage() {
   const [mensaje, setMensaje] = useState(null);
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(false);
+  
+    const criteriosNotas = [
+      [
+        "¿El resumen presenta de manera clara y concisa los objetivos, metodología, resultados y conclusiones del estudio?",
+        "¿El lenguaje utilizado es preciso y adecuado para el campo de la bioquímica y biología molecular?",
+        "¿El resumen es fácil de entender para un lector con conocimientos generales en el área?",
+      ],
+      [
+        "¿Los resultados presentados son coherentes con los métodos utilizados y las conclusiones extraídas?",
+        "¿Se evitan afirmaciones no justificadas o especulaciones?",
+        "¿Se utilizan correctamente los términos técnicos y conceptos propios de la disciplina?"
+      ],
+      [
+        "¿El estudio aborda un tema relevante para el campo de la bioquímica y biología molecular?",
+        "¿Los resultados presentados aportan información nueva o relevante para la comunidad científica?",
+        "¿Se justifica la importancia del estudio en el contexto del congreso?"
+      ],
+      [
+        "¿El resumen sigue una estructura lógica y coherente (introducción, metodología, resultados, conclusiones)?",
+        "¿La información se presenta de forma organizada y fácil de seguir?",
+        "¿Se cumplen las directrices específicas del congreso en cuanto a la longitud, formato y contenido del resumen?"
+      ],
+    ];
+
 
   useEffect(() => {
     fetch("/api/users")
@@ -109,12 +133,12 @@ export default function UserDetailPage() {
   if (!user)
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-700"></div>
       </div>
     );
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-8 bg-white shadow-lg rounded-2xl space-y-6">
+    <div className="max-w-3xl mx-auto mt-10 p-8 bg-white shadow-lg rounded-2xl space-y-6">
       {mensaje && (
         <div className="bg-green-600 text-white px-4 py-2 rounded-lg text-center mb-4">
           {mensaje}
@@ -124,7 +148,7 @@ export default function UserDetailPage() {
       <div className="text-gray-700">
         <h1 className="text-2xl font-bold mb-2">
           Nombre del Autor:{" "}
-          <span className="text-blue-600">{user.name}</span>
+          <span className="text-blue-800">{user.name}</span>
         </h1>
         <p className="mb-2">
           <span className="font-semibold">Correo:</span> {user.email}
@@ -132,6 +156,10 @@ export default function UserDetailPage() {
         <p className="mb-2">
           <span className="font-semibold">Código:</span>{" "}
           {user.alph || "No disponible"}
+        </p>
+        <p className="mb-2">
+          <span className="font-semibold">Nombre del proyecto:</span>{" "}
+          {user.nombreProyecto || "No disponible"}
         </p>
       </div>
 
@@ -146,16 +174,24 @@ export default function UserDetailPage() {
             <label className="block font-semibold text-gray-600 mb-1">
               {nota.label}
             </label>
+
+            <ul className="list-disc pl-5 text-sm text-gray-500 space-y-1 mb-2">
+              {criteriosNotas[idx].map((criterio, cIdx) => (
+                <li key={cIdx}>{criterio}</li>
+              ))}
+            </ul>
+
             <input
               type="number"
               value={nota.value}
               onChange={(e) => nota.setter(e.target.value)}
+              placeholder="Insertar la nota aquí"
               min="0"
               max="25"
               step="0.1"
               required
               disabled={disabled}
-              className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-700"
             />
           </div>
         ))}
@@ -170,7 +206,7 @@ export default function UserDetailPage() {
             onChange={(e) => setDescripcion(e.target.value)}
             rows={3}
             disabled={disabled}
-            className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-700"
           />
         </div>
 
@@ -178,8 +214,8 @@ export default function UserDetailPage() {
           type="submit"
           disabled={disabled}
           className={`w-full py-2.5 rounded-lg font-semibold shadow transition ${disabled
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 text-white hover:bg-blue-700"
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-700 text-white hover:bg-blue-800"
             }`}
         >
           {loading ? (
