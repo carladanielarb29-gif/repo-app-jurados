@@ -92,9 +92,9 @@ export default function Home() {
               return (
                 <tr
                   key={author.id}
-                  className={`transition ${alreadyRated
-                    ? "bg-gray-100 cursor-not-allowed"
-                    : "hover:bg-gray-50 cursor-pointer"
+                  className={`transform transition-transform duration-200 ease-in-out ${alreadyRated
+                      ? "bg-gray-100 cursor-not-allowed"
+                      : "hover:bg-gray-50 hover:scale-[1.02] cursor-pointer"
                     }`}
                   onClick={() => {
                     if (!alreadyRated) {
