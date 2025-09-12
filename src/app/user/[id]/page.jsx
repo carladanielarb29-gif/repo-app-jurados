@@ -22,29 +22,29 @@ export default function UserDetailPage() {
   const [mensaje, setMensaje] = useState(null);
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(false);
-  
-    const criteriosNotas = [
-      [
-        "¿El resumen presenta de manera clara y concisa los objetivos, metodología, resultados y conclusiones del estudio?",
-        "¿El lenguaje utilizado es preciso y adecuado para el campo de la bioquímica y biología molecular?",
-        "¿El resumen es fácil de entender para un lector con conocimientos generales en el área?",
-      ],
-      [
-        "¿Los resultados presentados son coherentes con los métodos utilizados y las conclusiones extraídas?",
-        "¿Se evitan afirmaciones no justificadas o especulaciones?",
-        "¿Se utilizan correctamente los términos técnicos y conceptos propios de la disciplina?"
-      ],
-      [
-        "¿El estudio aborda un tema relevante para el campo de la bioquímica y biología molecular?",
-        "¿Los resultados presentados aportan información nueva o relevante para la comunidad científica?",
-        "¿Se justifica la importancia del estudio en el contexto del congreso?"
-      ],
-      [
-        "¿El resumen sigue una estructura lógica y coherente (introducción, metodología, resultados, conclusiones)?",
-        "¿La información se presenta de forma organizada y fácil de seguir?",
-        "¿Se cumplen las directrices específicas del congreso en cuanto a la longitud, formato y contenido del resumen?"
-      ],
-    ];
+
+  const criteriosNotas = [
+    [
+      "¿El resumen presenta de manera clara y concisa los objetivos, metodología, resultados y conclusiones del estudio?",
+      "¿El lenguaje utilizado es preciso y adecuado para el campo de la bioquímica y biología molecular?",
+      "¿El resumen es fácil de entender para un lector con conocimientos generales en el área?",
+    ],
+    [
+      "¿Los resultados presentados son coherentes con los métodos utilizados y las conclusiones extraídas?",
+      "¿Se evitan afirmaciones no justificadas o especulaciones?",
+      "¿Se utilizan correctamente los términos técnicos y conceptos propios de la disciplina?"
+    ],
+    [
+      "¿El estudio aborda un tema relevante para el campo de la bioquímica y biología molecular?",
+      "¿Los resultados presentados aportan información nueva o relevante para la comunidad científica?",
+      "¿Se justifica la importancia del estudio en el contexto del congreso?"
+    ],
+    [
+      "¿El resumen sigue una estructura lógica y coherente (introducción, metodología, resultados, conclusiones)?",
+      "¿La información se presenta de forma organizada y fácil de seguir?",
+      "¿Se cumplen las directrices específicas del congreso en cuanto a la longitud, formato y contenido del resumen?"
+    ],
+  ];
 
 
   useEffect(() => {
@@ -107,6 +107,7 @@ export default function UserDetailPage() {
       ...nuevasNotas,
       comentario: { nombreJurado: juradoEmail, feedback: descripcion },
       notaFinal, // será null hasta que llegue el 3er jurado
+      modalidad: e.target["tipo-presentacion"].value,
     };
 
     const res = await fetch("/api/users", {
@@ -197,10 +198,34 @@ export default function UserDetailPage() {
         ))}
 
         <div>
+          <label
+            htmlFor="tipo-presentacion"
+            className="block font-semibold text-gray-600 mb-1"
+          >
+            Modalidad
+          </label>
+          <select
+            id="tipo-presentacion"
+            name="tipo-presentacion"
+            className="block w-full rounded-lg border border-gray-700 bg-white px-4 py-2 text-gray-400 focus:border-blue-500 focus:ring-blue-500"
+            defaultValue=""
+            required
+          >
+            <option value="" disabled>
+              Selecciona una opción de modalidad
+            </option>
+            <option value="oral-extendido">Oral extendido</option>
+            <option value="oral-corto">Oral corto</option>
+            <option value="poster">Póster</option>
+          </select>
+        </div>
+
+        <div>
           <label className="block font-semibold text-gray-600 mb-1">
             Comentario
           </label>
           <textarea
+            placeholder="Inserte sus comentarios aquí"
             value={descripcion}
             required
             onChange={(e) => setDescripcion(e.target.value)}

@@ -15,9 +15,9 @@ export async function GET() {
 }
 
 export async function POST(req) {
-  const { id, notas1, notas2, notas3, notas4, comentario, notaFinal } = await req.json();
+  const { id, notas1, notas2, notas3, notas4, comentario, notaFinal, modalidad } = await req.json();
 
-  console.log("Received POST data:", { id, notas1, notas2, notas3, notas4, comentario, notaFinal });
+  console.log("Received POST data:", { id, notas1, notas2, notas3, notas4, comentario, notaFinal, modalidad });
 
   // Traer el usuario por id
   const { data: userData, error: fetchError } = await supabase
@@ -81,7 +81,8 @@ export async function POST(req) {
     notas4: [...(userData.notas4 || []), ...(notas4 ? [notas4] : [])],
     comentarios: [...(userData.comentarios || []), ...(comentario ? [comentario] : [])],
     notaFinal: notaFinal ?? userData.notaFinal,
-    status: notaFinal !== null ? "completed" : userData.status || "pending"
+    status: notaFinal !== null ? "completed" : userData.status || "pending",
+    modalidad: [...(userData.modalidad || []), ...(modalidad ? [modalidad] : [])],
   };
 
   const { error: updateError } = await supabase
