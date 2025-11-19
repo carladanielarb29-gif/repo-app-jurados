@@ -6,7 +6,7 @@ import { Resend } from "resend";
 const resend = new Resend('re_C7qXjmfr_3UekieAc6pyDrL1WGFrUWdcd');
 
 export async function GET() {
-  const { data, error } = await supabase.from('users').select('*');
+  const { data, error } = await supabase.from('users2').select('*');
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -15,13 +15,13 @@ export async function GET() {
 }
 
 export async function POST(req) {
-  const { id, notas1, notas2, notas3, notas4, comentario, notaFinal, modalidad } = await req.json();
+  const { id, nota1, nota2, nota3, notaFinal, modalidad, alph, juradoEmail } = await req.json();
 
-  console.log("Received POST data:", { id, notas1, notas2, notas3, notas4, comentario, notaFinal, modalidad });
+  console.log("Received POST data:", { id, nota1, nota2, nota3, notaFinal, modalidad });
 
   // Traer el usuario por id
   const { data: userData, error: fetchError } = await supabase
-    .from('users')
+    .from('users2')
     .select('*')
     .eq('id', id)
     .single();
@@ -33,16 +33,6 @@ export async function POST(req) {
   if (notaFinal !== null) {
     console.log("Enviando email con nota final:", notaFinal);
 
-    const comentariosTotales = [
-      ...(userData.comentarios || []),
-      ...(comentario ? [comentario] : [])
-    ];
-
-    const comentariosHtml = comentariosTotales
-      .map((comentario, index) => `
-      <p><b>Jurado ${index + 1}:</b> ${comentario?.feedback}</p>
-    `)
-      .join("");
 
     await resend.emails.send({
       from: 'evaluacion@resend.dev',
@@ -62,8 +52,14 @@ export async function POST(req) {
           </span>
         </p>
 
-        <h3>📝 Comentarios de los jurados:</h3>
-        ${comentariosHtml}
+        <h3>📝 Codigo del trabajo:</h3>
+        ${alph}
+
+        <h3>📝 Modalidad del trabajo:</h3>
+        ${modalidad}
+
+        <h3>📝 Email del jurado:</h3>
+        ${juradoEmail}
 
         <hr style="margin-top:20px; border: none; border-top: 1px solid #ddd;" />
         <p style="font-size: 12px; color: #777;">
@@ -75,18 +71,15 @@ export async function POST(req) {
   }
 
   const updatedUser = {
-    notas1: [...(userData.notas1 || []), ...(notas1 ? [notas1] : [])],
-    notas2: [...(userData.notas2 || []), ...(notas2 ? [notas2] : [])],
-    notas3: [...(userData.notas3 || []), ...(notas3 ? [notas3] : [])],
-    notas4: [...(userData.notas4 || []), ...(notas4 ? [notas4] : [])],
-    comentarios: [...(userData.comentarios || []), ...(comentario ? [comentario] : [])],
-    notaFinal: notaFinal ?? userData.notaFinal,
-    status: notaFinal !== null ? "completed" : userData.status || "pending",
-    modalidad: [...(userData.modalidad || []), ...(modalidad ? [modalidad] : [])],
+    nota1: nota1,
+    nota2: nota2,
+    nota3: nota3,
+    notaFinal: notaFinal,
+    status: "completed",
   };
 
   const { error: updateError } = await supabase
-    .from('users')
+    .from('users2')
     .update(updatedUser)
     .eq('id', id);
 

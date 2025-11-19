@@ -16,8 +16,6 @@ export default function UserDetailPage() {
   const [nota1, setNota1] = useState("");
   const [nota2, setNota2] = useState("");
   const [nota3, setNota3] = useState("");
-  const [nota4, setNota4] = useState("");
-  const [descripcion, setDescripcion] = useState("");
 
   const [mensaje, setMensaje] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -25,24 +23,18 @@ export default function UserDetailPage() {
 
   const criteriosNotas = [
     [
-      "¿El resumen presenta de manera clara y concisa los objetivos, metodología, resultados y conclusiones del estudio?",
-      "¿El lenguaje utilizado es preciso y adecuado para el campo de la bioquímica y biología molecular?",
-      "¿El resumen es fácil de entender para un lector con conocimientos generales en el área?",
-    ],
-    [
-      "¿Los resultados presentados son coherentes con los métodos utilizados y las conclusiones extraídas?",
-      "¿Se evitan afirmaciones no justificadas o especulaciones?",
-      "¿Se utilizan correctamente los términos técnicos y conceptos propios de la disciplina?"
+      "¿El expositor presenta de manera clara y concisa los objetivos, metodología, resultados y conclusiones del estudio?",
+      "¿Se utilizan correctamente los términos técnicos y conceptos propios de la disciplina?",
+      "¿El mensaje se presenta de forma coherente de acuerdo con conocimientos generales en el área?"
     ],
     [
       "¿El estudio aborda un tema relevante para el campo de la bioquímica y biología molecular?",
-      "¿Los resultados presentados aportan información nueva o relevante para la comunidad científica?",
-      "¿Se justifica la importancia del estudio en el contexto del congreso?"
+      "¿Los resultados presentados aportan información nueva o relevante para la comunidad científica?"
     ],
     [
-      "¿El resumen sigue una estructura lógica y coherente (introducción, metodología, resultados, conclusiones)?",
-      "¿La información se presenta de forma organizada y fácil de seguir?",
-      "¿Se cumplen las directrices específicas del congreso en cuanto a la longitud, formato y contenido del resumen?"
+      "¿Hay una estructura y un orden lógic y coherente (introducción, metodología, resultados, conclusiones)?",
+      "¿El contenido es concreto y usado de forma apropiada?",
+      "¿El expositor hizo un manejo de tiempo apropiado?"
     ],
   ];
 
@@ -56,34 +48,17 @@ export default function UserDetailPage() {
       });
   }, [userId]);
 
-  // 👉 función para calcular la nota final SOLO si hay 3 jurados
-  const calcularNotaFinal = (user, nuevasNotas) => {
-    if (!user) return null;
+  const calcularNotaFinal = () => {
+    if (!nota1 || !nota2 || !nota3) return null;
 
-    const keys = ["notas1", "notas2", "notas3", "notas4"];
+    const total =
+      parseInt(nota1, 10) +
+      parseInt(nota2, 10) +
+      parseInt(nota3, 10);
 
-    const promedios = keys.map((key) => {
-      const existentes = Array.isArray(user[key]) ? [...user[key]] : [];
-
-      // agrega la nueva nota del jurado actual
-      if (nuevasNotas[key]) {
-        existentes.push(nuevasNotas[key]);
-      }
-
-      // si aún hay menos de 3 jurados en esta categoría, no podemos calcular
-      if (existentes.length < 3) return null;
-
-      const sum = existentes.reduce((acc, n) => acc + n.puntaje, 0);
-      return sum / existentes.length;
-    });
-
-    // si alguna categoría todavía no tiene 3 jurados, no calculamos nada
-    if (promedios.some((p) => p === null)) return null;
-
-    // la nota final es la SUMA de los 4 promedios
-    const total = promedios.reduce((a, b) => a + b, 0);
-    return parseFloat(total.toFixed(2));
+    return total;
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -92,21 +67,16 @@ export default function UserDetailPage() {
     setLoading(true);
     setDisabled(true);
 
-    const nuevasNotas = {
-      notas1: { puntaje: parseFloat(nota1), nombreJurado: juradoEmail },
-      notas2: { puntaje: parseFloat(nota2), nombreJurado: juradoEmail },
-      notas3: { puntaje: parseFloat(nota3), nombreJurado: juradoEmail },
-      notas4: { puntaje: parseFloat(nota4), nombreJurado: juradoEmail },
-    };
-
-    // calcular la nota final SOLO si ya hay 3 jurados
-    const notaFinal = calcularNotaFinal(user, nuevasNotas);
+    const notaFinal = calcularNotaFinal(user);
 
     const payload = {
       id: userId,
-      ...nuevasNotas,
-      comentario: { nombreJurado: juradoEmail, feedback: descripcion },
-      notaFinal, // será null hasta que llegue el 3er jurado
+      nota1: parseInt(nota1, 10) || null,
+      nota2: parseInt(nota2, 10) || null,
+      nota3: parseInt(nota3, 10) || null,
+      juradoEmail: juradoEmail,
+      notaFinal,
+      alph: user.alph,
       modalidad: e.target["tipo-presentacion"].value,
     };
 
@@ -152,9 +122,6 @@ export default function UserDetailPage() {
           <span className="text-blue-800">{user.name}</span>
         </h1>
         <p className="mb-2">
-          <span className="font-semibold">Correo:</span> {user.email}
-        </p>
-        <p className="mb-2">
           <span className="font-semibold">Código:</span>{" "}
           {user.alph || "No disponible"}
         </p>
@@ -162,14 +129,22 @@ export default function UserDetailPage() {
           <span className="font-semibold">Nombre del proyecto:</span>{" "}
           {user.nombreProyecto || "No disponible"}
         </p>
+
+        <p className="mb-2"><strong>OBSERVACIÓN:</strong> La escala de evaluación en cada criterio va de 0 a 5. No se aceptan números con decimales:</p>
+        <ul class=" text-sm text-gray-500 list-disc pl-5 space-y-1">
+          <li><strong>(5)</strong> Cumple con todas las características del criterio. Es excepcional.</li>
+          <li><strong>(4)</strong> Cumple casi todas las características del criterio. Es muy bueno.</li>
+          <li><strong>(3)</strong> Cumple algunas de las características del criterio. Es regular, puede ser mejor.</li>
+          <li><strong>(2)</strong> Apenas si cumple un aspecto del criterio. Es insuficiente.</li>
+          <li><strong>(0–1)</strong> No cumple con las características del criterio.</li>
+        </ul>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {[
-          { label: "Nota Claridad y Concisión", value: nota1, setter: setNota1 },
-          { label: "Nota Exactitud Científica", value: nota2, setter: setNota2 },
-          { label: "Nota Relevancia", value: nota3, setter: setNota3 },
-          { label: "Nota Estructura y Organización", value: nota4, setter: setNota4 },
+          { label: "Claridad y Exactitud científica (Valoración: 0-5 Puntos)", value: nota1, setter: setNota1 },
+          { label: "Relevancia e impacto (Valoración: 0-5 Puntos)", value: nota2, setter: setNota2 },
+          { label: "Estructura y organización del formato de presentación (Valoración: 0-5 Puntos)", value: nota3, setter: setNota3 },
         ].map((nota, idx) => (
           <div key={idx}>
             <label className="block font-semibold text-gray-600 mb-1">
@@ -188,8 +163,8 @@ export default function UserDetailPage() {
               onChange={(e) => nota.setter(e.target.value)}
               placeholder="Insertar la nota aquí"
               min="0"
-              max="25"
-              step="0.1"
+              max="5"
+              step="1"
               required
               disabled={disabled}
               className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-700"
@@ -218,21 +193,6 @@ export default function UserDetailPage() {
             <option value="oral-corto">Oral corto</option>
             <option value="poster">Póster</option>
           </select>
-        </div>
-
-        <div>
-          <label className="block font-semibold text-gray-600 mb-1">
-            Comentario
-          </label>
-          <textarea
-            placeholder="Inserte sus comentarios aquí"
-            value={descripcion}
-            required
-            onChange={(e) => setDescripcion(e.target.value)}
-            rows={3}
-            disabled={disabled}
-            className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-700"
-          />
         </div>
 
         <button
