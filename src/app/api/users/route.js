@@ -52,11 +52,11 @@ export async function POST(req) {
           </span>
         </p>
 
-        <h1>📝 Codigo del trabajo: </h1>${alph}
+        <h4>📝 Codigo del trabajo: ${alph}</h4>
 
-        <h1>📝 Modalidad del trabajo:</h1>${modalidad}
+        <h4>📝 Modalidad del trabajo: ${modalidad}</h4>
 
-        <h1>📝 Email del jurado: </h1>${juradoEmail}
+        <h4>📝 Email del jurado: ${juradoEmail}</h4>
 
         <hr style="margin-top:20px; border: none; border-top: 1px solid #ddd;" />
         <p style="font-size: 12px; color: #777;">
